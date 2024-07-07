@@ -94,8 +94,29 @@ const signin = async (req, res) => {
     });
   }
 };
+// Get User
+
+const getUser = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const user = await userModel.findById(userId);
+    return res.status(200).json({
+      success: true,
+      data: user,
+      msg: 'User Getting successfully!!',
+    });
+  } catch (e) {
+    return res.status(400).json({
+      success: false,
+
+      message: `Something went wrong!! ${e.message}`,
+    });
+  }
+};
 
 module.exports = {
   signup,
   signin,
+  getUser,
 };
