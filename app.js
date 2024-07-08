@@ -1,7 +1,7 @@
 import express from 'express';
 
 import db_connect from './config/db_config.js';
-import authRouter from './Routes/authRoute.js';
+
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -22,14 +22,13 @@ app.use(morgan('dev'));
 
 app.use('/ping', (req, res) => {
   res.status(200).json({
-    data: 'JWT Auth Server',
+    data: 'Pong👋',
   });
 });
 
 // Routes of module-----
 
 app.use('/api/v1/user', userRoutes);
-app.use('/api/auth', authRouter);
 
 app.all('*', (req, res) => {
   res.status(404).send('OOPS!! 404 page not found');
