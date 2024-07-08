@@ -65,16 +65,18 @@ const login = async (req, res, next) => {
       email,
     }).select('+password');
 
-    if (!user || !user.comparePassword(password)) {
-      return next(new AppError('email and password does not match', 400));
+    if (!user) {
+      console.log('User not found');
+      return next(new AppError('Email and password do not match', 400));
     }
-    // if (!user || !bcrypt.compare(password, user.password)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: 'invalid credentials',
-    //   });
-    // }
 
+    const isMatch = await user.comparePassword(password);
+    console.log('Password match:', isMatch);
+
+    if (!isMatch) {
+      console.log('Password does not match');
+      return next(new AppError('Email and password do not match', 400));
+    }
     const token = await user.generateJWTToken();
     user.password = undefined;
 
@@ -82,7 +84,7 @@ const login = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'User Logged in succussfully!!',
+      message: 'User logged in succussfully!!',
       data: user,
     });
   } catch (err) {
