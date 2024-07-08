@@ -1,8 +1,12 @@
-const express = require('express');
-const authRouter = require('./Routes/authRoute');
-const db_connect = require('./config/db_config');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
+import express from 'express';
+
+import db_connect from './config/db_config.js';
+import authRouter from './Routes/authRoute.js';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import morgan from 'morgan';
+import userRoutes from './Routes/user.route.js';
+import errorMiddleware from './middleware/error.middleware.js';
 const app = express();
 app.use(express.json());
 db_connect();
@@ -14,19 +18,23 @@ app.use(
     credentials: true,
   })
 );
+app.use(morgan('dev'));
 
-app.use('/', (req, res) => {
-    res.status(200).json({
-        data: 'JWT Auth Server',
-    });
+app.use('/ping', (req, res) => {
+  res.status(200).json({
+    data: 'JWT Auth Server',
+  });
 });
 
 // Routes of module-----
+
+app.use('/api/v1/user', userRoutes);
 app.use('/api/auth', authRouter);
 
-app.all('*',(req,res)=>{
-    res.status(404).send('OOPS!! 404 page not found')
-})
+app.all('*', (req, res) => {
+  res.status(404).send('OOPS!! 404 page not found');
+});
 
+app.use(errorMiddleware);
 
-module.exports = app;
+export default app;

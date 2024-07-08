@@ -1,6 +1,7 @@
-const userModel = require('../model/user_schema');
-const emailValidator = require('email-validator');
-const bcrypt = require('bcrypt');
+import userModel from '../model/user_schema.js';
+
+import emailValidator from 'email-validator';
+import bcrypt from 'bcrypt';
 
 const signup = async (req, res, next) => {
   const { name, email, password, confirmPassword } = req.body;
@@ -68,7 +69,7 @@ const signin = async (req, res) => {
       })
       .select('+password');
 
-    if (!user || !(bcrypt.compare(password, user.password)) ){
+    if (!user || !bcrypt.compare(password, user.password)) {
       return res.status(400).json({
         success: false,
         message: 'invalid credentials',
@@ -138,9 +139,4 @@ const logout = (req, res) => {
   }
 };
 
-module.exports = {
-  signup,
-  signin,
-  getUser,
-  logout,
-};
+export { signup, signin, getUser, logout };

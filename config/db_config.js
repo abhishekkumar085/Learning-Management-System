@@ -1,17 +1,19 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
 const MONGODB_URL =
   process.env.MONGODB_URL || 'mongodb://localhost:27017/lms_backend';
 
-const db_connect = () => {
-  mongoose
-    .connect(MONGODB_URL)
-    .then((conn) => {
-      console.log(`Connected to DB : ${conn.connection.host}`);
-    })
-    .catch((err) => {
-      console.log(err.message);
-    });
+mongoose.set('strictQuery', false);
+
+const db_connect = async () => {
+  try {
+    const { connection } = await mongoose.connect(MONGODB_URL);
+    if (connection) {
+      console.log(`Connected to db ${connection.host}`);
+    }
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
 };
 
-module.exports = db_connect;
+export default db_connect;

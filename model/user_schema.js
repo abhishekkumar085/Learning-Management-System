@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
-const JWT = require('jsonwebtoken');
-const bcrypt=require('bcrypt')
+
+import mongoose  from 'mongoose';
+import JWT from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 const { Schema } = mongoose;
 
@@ -57,4 +58,4 @@ userSchema.methods = {
 
 const userModel = mongoose.model('user', userSchema);
 
-module.exports = userModel;
+export default userModel;
