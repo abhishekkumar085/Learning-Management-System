@@ -5,13 +5,14 @@ import db_connect from './config/db_config.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import morgan from 'morgan';
-import userRoutes from './Routes/user.route.js';
+import userRoutes from './routes/user.route.js';
+import courseRoutes from './routes/course.route.js';
 import errorMiddleware from './middleware/error.middleware.js';
 const app = express();
 app.use(express.json());
 db_connect();
 
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }));
 
 app.use(cookieParser());
 app.use(
@@ -29,8 +30,8 @@ app.use('/ping', (req, res) => {
 });
 
 // Routes of module-----
-
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/courses', courseRoutes);
 
 app.all('*', (req, res) => {
   res.status(404).send('OOPS!! 404 page not found');
