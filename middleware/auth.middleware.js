@@ -27,4 +27,13 @@ const authorizedRoles =
     next();
   };
 
-export { isLoggedIn, authorizedRoles };
+const authorizedSubscriber = async (req, res, next) => {
+  const subscription = req.user.subscription;
+  const currentRole = req.user.role;
+
+  if (currentRole !== 'ADMIN' && subscription.status !== 'active') {
+    new AppError('You do not have permission to access this route', 403);
+  }
+};
+
+export { isLoggedIn, authorizedRoles, authorizedSubscriber };
