@@ -5,7 +5,8 @@ import fs from 'fs/promises';
 // get All Course
 const getAllCourses = async (req, res, next) => {
   try {
-    const courses = await Course.find({}).select('-lectures');
+    // const courses = await Course.find({}).select('-lectures');
+    const courses = await Course.find({});
     res.status(200).json({
       success: true,
       message: 'All Courses!!',
@@ -122,6 +123,83 @@ const removeCourse = async (req, res, next) => {
     return next(new AppError(err.message, 500));
   }
 };
+// Add lecturesToCourseByID
+
+const addLectureToCourseById = async (req, res, next) => {
+  try {
+    const { title, description } = req.body;
+    const { id } = req.params;
+    const course = await Course.findById(id);
+
+    if (!title || !description) {
+      return next(new AppError('All fields are required!!'));
+    }
+
+    if (!course) {
+      return next(new AppError('invalid course', 400));
+    }
+
+    const lectureData = {
+      title,
+      description,
+      lectures: {},
+    };
+    if (req.file) {
+      try {
+        const result = await cloudinary.v2.uploader.upload(req.file.path, {
+          folder: 'lms',
+        });
+        if (result) {
+          lectureData.lectures.public_id = result.public_id;
+          lectureData.lectures.secure_url = result.secure_url;
+        }
+
+        fs.rm(`uploads/${req.file.filename}`);
+      } catch (err) {
+        return next(new AppError(err.message, 500));
+      }
+    }
+
+    course.lectures.push(lectureData);
+
+    course.numberOfLectures = course.lectures.length;
+
+    await course.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'lecture successfully Added',
+      course,
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
+
+// delete lectures by lectures id
+
+const deleteLectures = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const course = await Course.findOne({ 'lectures._id': id });
+    if (!course) {
+      return next(new AppError('Invalid lecture', 404));
+    }
+    const lecture = course.lectures.id(id);
+    if (!lecture) {
+      return next(new AppError('Lecture not found', 404));
+    }
+    course.lectures.pull({ _id: id });
+    await course.save();
+    return res.status(200).json({
+      success: true,
+      message: 'lecture deleted successfully!!',
+    });
+  } catch (err) {
+    return next(new AppError(err.message, 500));
+  }
+};
 
 export {
   getAllCourses,
@@ -129,4 +207,6 @@ export {
   createCourse,
   updateCourse,
   removeCourse,
+  addLectureToCourseById,
+  deleteLectures,
 };
